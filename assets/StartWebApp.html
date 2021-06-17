@@ -1,0 +1,77 @@
+<!doctype html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Storage Showcase</title>
+    </head>
+    <body>
+<!--    Special characters (e.g. &quot;) not handled !!!-->
+        <h3>Local Storage</h3>
+        <p><label>Key: <input id="lKey" type="text"></label></p>
+        <p><label>Value: <input id="lValue" type="text"></label></p>
+        <button id="lStore">Store key/value</button>
+        <p>Current keys:</p>
+        <ul id="localStorage"></ul>
+        <button id="lClear">Clear Local Storage</button>
+        <h3>Session Storage</h3>
+        <p><label>Key: <input id="sKey" type="text"></label></p>
+        <p><label>Value: <input id="sValue" type="text"></label></p>
+        <button id="sStore">Store key/value</button>
+        <p>Current keys:</p>
+        <ul id="sessionStorage"></ul>
+        <button id="sClear">Clear Session Storage</button>
+        <script>
+            function updateList(storage) {
+                var key;
+                var str = '';
+                var storageObj = window[storage];
+                Object.keys(storageObj).forEach(function (key) {
+                    str += '<li data-key="'+key+'">KEY: &quot;'+key+'&quot; , VALUE: &quot;';
+                    str += storageObj.getItem(key)+'&quot; <button>Remove</button></li>';
+                }); 
+                document.getElementById(storage).innerHTML = str;
+            }
+            window.addEventListener('load', function () {
+                updateList('localStorage');
+                updateList('sessionStorage');
+            });
+            document.getElementById('lClear').addEventListener('click', function () {
+                localStorage.clear();
+                updateList('localStorage');
+            });
+            document.getElementById('sClear').addEventListener('click', function () {
+                sessionStorage.clear();
+                updateList('sessionStorage');
+            });
+            document.getElementById('lStore').addEventListener('click', function () {
+                var key = document.getElementById('lKey').value;
+                var value = document.getElementById('lValue').value;
+                localStorage.setItem(key, value);
+                updateList('localStorage');
+            });
+            document.getElementById('sStore').addEventListener('click', function () {
+                var key = document.getElementById('sKey').value;
+                var value = document.getElementById('sValue').value;
+                sessionStorage.setItem(key, value);
+                updateList('sessionStorage');
+            });
+            function removeKey(evt) {
+                var key;
+                if ( evt.target.nodeName !== 'BUTTON' ) return;
+                key = evt.target.parentNode.getAttribute('data-key');
+                window[evt.currentTarget.id].removeItem(key);
+                updateList(evt.currentTarget.id);
+            }
+            document.getElementById('localStorage').addEventListener('click', removeKey);
+            document.getElementById('sessionStorage').addEventListener('click', removeKey);
+            // Needs another browser tab, cannot identify sessionStorage events
+            window.addEventListener('storage', function (evt) {
+                document.body.innerHTML = 'url: ' + evt.url + '<br>' +
+                  'key: ' + evt.key + '<br>' +
+                  'oldValue: ' + evt.oldValue + '<br>' +
+                  'newValue: ' + evt.newValue;
+            });
+        </script>
+    </body>
+</html>
